@@ -1,0 +1,24 @@
+image: node:16
+
+stages:
+  - test
+  - deploy
+
+cache:
+  paths:
+    - node_modules/
+
+test:
+  stage: test
+  script:
+    - npm install
+    - npm test
+
+deploy:
+  stage: deploy
+  script:
+    - npm install
+    - npm run build
+    - npm run start
+  only:
+    - master

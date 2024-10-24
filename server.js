@@ -2,10 +2,24 @@ const express = require("express");
 const connectDb = require("./config/DBconnection");
 const errorHandler = require("./middleware/errorHandler");
 require("dotenv").config();
-
 const app = express();
+const cookieParse = require("cookie-parser");
+const cors = require("cors");
+
 connectDb();
 app.use(express.json());
+app.use(cookieParse());
+const corsOptions = {
+  origin: "http://localhost:5173",
+  methods: "GET,POST,PUT,PATCH,DELETE",
+  credentials: true, // Allow credentials (cookies, authentication headers, etc.)
+};
+
+app.use(cors(corsOptions));
+
+app.get("/", (req, res) => {
+  res.send("Server is running");
+});
 app.use("/tickets", require("./Routes/tickets"));
 app.use("/admin", require("./Routes/admin"));
 app.use("/user", require("./Routes/user"));

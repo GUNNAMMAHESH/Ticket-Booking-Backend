@@ -12,7 +12,7 @@ const adminSchema = mongoose.Schema(
     },
     proof: {
       type: String,
-      required: [true, "Please enter proof"],
+      // required: [true, "Please enter proof"],
     },
     email: {
       type: String,

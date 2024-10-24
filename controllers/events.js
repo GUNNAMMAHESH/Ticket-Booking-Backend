@@ -6,11 +6,14 @@ const dotenv = require("dotenv").config();
 const Event = require("../models/events");
 
 const CreateEvent = asyncHandler(async (req, res) => {
+req.user
   if (req.user.role !== "admin") {
     res.status(401).json({error:"only admin can access"})
   }
 
   const { EventName, date, location, price } = req.body;
+  console.log(req.body);
+  
 
   if (!EventName || !date || !location || !price) {
     res.status(400).json({ error: "Enter all fields" });

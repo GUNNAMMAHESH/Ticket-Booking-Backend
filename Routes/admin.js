@@ -11,8 +11,8 @@ const {
 const validateToken = require("../middleware/validateTokenHandler");
 const Router = express.Router();
 
-Router.post("/create", CreateAdmin);
-Router.post("/login", loginAdmin);
+// Router.post("/create", CreateAdmin);
+// Router.post("/login", loginAdmin);
 Router.get("/profile", validateToken, adminProfile);
 Router.delete("/delete/:id", validateToken, deleteAdmin);
 

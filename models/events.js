@@ -16,6 +16,10 @@ const event =mongoose.Schema({
     price:{
         type:Number,
         required:[true,"please enter price"]
+    },
+    totalSeats:{
+        type:Number,
+        required:[true,"please enter total seats"]
     }
     
 },{

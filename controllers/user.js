@@ -2,21 +2,73 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const OTP = require('../models/otp');
+const otpGenerator = require('otp-generator');
+
+exports.sendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if user is already present
+    const checkUserPresent = await User.findOne({ email });
+    if (checkUserPresent) {
+      return res.status(401).json({
+        success: false,
+        message: 'User is already registered',
+      });
+    }
+
+    // Generate a 6-digit OTP
+    let otp = otpGenerator.generate(6, {
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
+      specialChars: false,
+    });
+
+    // Ensure OTP is unique by checking in the database
+    let result = await OTP.findOne({ otp });
+    while (result) {
+      otp = otpGenerator.generate(6, {
+        upperCaseAlphabets: false,
+      });
+      result = await OTP.findOne({ otp });
+    }
+
+    // Save OTP to the database
+    const otpPayload = { email, otp };
+    await OTP.create(otpPayload);
+
+    // Send success response without revealing the OTP
+    res.status(200).json({
+      success: true,
+      message: 'OTP sent successfully. Please check your email.',
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({
+      success: false,
+      message: 'An error occurred while sending the OTP',
+      error: error.message,
+    });
+  }
+};
 
 const createUser = asyncHandler(async (req, res) => {
-  const { username, email, password, phone } = req.body;
-
-  if (!username || !email || !password || !phone) {
-    return res.status(400).json({ error: "All fields are mandatory" });
-  }
-
+  const { username, email, password, phone,role } = req.body;
+  console.log(req.body);
+  
   const userAvailable = await User.findOne({ email });
 
   if (userAvailable) {
     return res.status(400).json({ error: "User already registered" });
   }
 
-  const role = "user";
+  if (!username || !email || !password || !phone) {
+    return res.status(400).json({ error: "All fields are mandatory" });
+  }
+
+
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const user = await User.create({
@@ -26,6 +78,7 @@ const createUser = asyncHandler(async (req, res) => {
     phone,
     role,
   });
+  
 
   console.log("New user created:", user.username);
   res.status(201).json({
@@ -36,18 +89,28 @@ const createUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
+  const { email, password, otp } = req.body;
+  
+  // Check if all required fields are provided
+  if (!email || !password || !otp) {
     return res.status(400).json({ error: "All fields are mandatory" });
   }
 
+  // Check if the OTP exists and is valid
+  const existOtp = await OTP.findOne({ email, otp });
+  
+  // Validate OTP existence
+  if (!existOtp) {
+    return res.status(400).json({ error: "Invalid or expired OTP" });
+  }
+  
+  // Find the user by email
   const user = await User.findOne({ email });
-
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return res.status(401).json({ error: "Invalid email or password" });
   }
 
+  // Generate the JWT access token if OTP and credentials are valid
   const accessToken = jwt.sign(
     {
       user: {
@@ -58,11 +121,17 @@ const loginUser = asyncHandler(async (req, res) => {
       },
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "15m" }
+    { expiresIn: "1h" }
   );
 
-  res.status(200).json({ accessToken });
+  // Clean up: Optionally, delete the OTP after successful login
+  await OTP.deleteOne({ email, otp });
+
+  // Respond with the access token
+  res.status(200).json({ token: accessToken });
 });
+
+
 
 const profile = asyncHandler(async (req, res) => {
   if (req.user.role === "user" || req.user.role === "admin") {

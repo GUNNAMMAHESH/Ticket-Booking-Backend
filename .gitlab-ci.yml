@@ -1,24 +1,64 @@
+# Use the official Node.js image 
 image: node:16
 
+# Define stages in the pipeline
 stages:
+  - install
   - test
+  - build
   - deploy
 
+# Cache dependencies to speed up builds
 cache:
   paths:
     - node_modules/
 
+# Install dependencies
+install_dependencies:
+  stage: install
+  script:
+    - npm ci  # Use npm ci for a clean install based on package-lock.json
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1 hour  # Cache artifacts for 1 hour
+
+# Run tests
 test:
   stage: test
   script:
-    - npm install
-    - npm test
+    - npm test  # Run your tests
+  after_script:
+    - echo "Tests completed."
 
+# Build the application
+build:
+  stage: build
+  script:
+    - npm run build  # Run build script
+  artifacts:
+    paths:
+      - dist/  # Store build artifacts; ensure this matches your build output
+    expire_in: 1 hour
+
+# Deploy to production
 deploy:
   stage: deploy
+  environment:
+    name: production
+    url: https://ticket-booking-backend-h8iyimsal-maheshs-projects-7b91ea20.vercel.app/
   script:
-    - npm install
-    - npm run build
-    - npm run start
+    - npm install --production  # Install only production dependencies
+    - npm run start  # Start your application
   only:
-    - master
+    - main  # Only deploy from the main branch
+
+# Optional: Notifications (example with Slack)
+notifications:
+  slack:
+    webhooks:
+      - https://hooks.slack.com/services/your/slack/webhook
+    channels:
+      - '#your-channel'
+    on_failure: always
+    on_success: never

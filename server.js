@@ -10,7 +10,7 @@ connectDb();
 app.use(express.json());
 app.use(cookieParse());
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: "http://localhost:5000",
   methods: "GET,POST,PUT,PATCH,DELETE",
   credentials: true, // Allow credentials (cookies, authentication headers, etc.)
 };

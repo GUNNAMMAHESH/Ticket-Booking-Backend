@@ -1,22 +1,38 @@
 const asyncHandler = require("express-async-handler");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv").config();
-
+const { uploadImageToCloudinary } = require("../config/coludinary");
 const Event = require("../models/events");
 
 const CreateEvent = asyncHandler(async (req, res) => {
-req.user
+  
   if (req.user.role !== "admin") {
-    res.status(401).json({error:"only admin can access"})
+    return res.status(401).json({ error: "only admin can access" });
   }
 
   const { EventName, date, location, price } = req.body;
-  console.log(req.body);
-  
 
   if (!EventName || !date || !location || !price) {
-    res.status(400).json({ error: "Enter all fields" });
+    return res.status(400).json({ error: "Enter all fields" });
+  }
+
+  let photoUrl = null;
+console.log("body:",req.body);
+console.log("files:",req.files);
+
+
+  if (req.files && req.files.photo) {
+    const photo = req.files.photo;
+
+    try {
+      const uploadedImage = await uploadImageToCloudinary(
+        photo.tempFilePath, // Corrected path to tempFilePath
+        process.env.FOLDER_NAME,
+        1000,
+        1000
+      );
+      photoUrl = uploadedImage.secure_url;
+    } catch (error) {
+      return res.status(500).json({ error: "Error uploading image"});
+    }
   }
 
   const event = await Event.create({
@@ -24,46 +40,106 @@ req.user
     date,
     location,
     price,
+    photo: photoUrl,
   });
 
-  if (event) {
-    res.status(200).json(event);
-  } else {
-    res.status(400).json({ error: "Error While creating Event" });
-  }
+  return res.status(201).json(event);
+
+// console.log("uploadImageToCloudinary:", uploadImageToCloudinary); 
+
+// if (!req.files || !req.files.photo) {
+//   return res.status(400).json({ error: "No file uploaded." });
+// }
+
+// const photo = req.files.photo;
+
+// try {
+//   const result = await uploadImageToCloudinary(photo.tempFilePath, "test-folder");
+//   return res.status(200).json({ url: result.secure_url });
+// } catch (error) {
+//   return res.status(500).json({ error: "Upload failed." });
+// }
+
+
 });
 
+
 const EventDetails = asyncHandler(async (req, res) => {
-  const eventId = await Event.findOne({ _id: req.params.id });
+  const eventId = await Event.findById(req.params.id);
   if (eventId) {
-    res.status(200).json(eventId);
+    return res.status(200).json(eventId);
   } else {
-    res.status(404).json({ error: "Event not found" });
+    return res.status(404).json({ error: "Event not found" });
   }
 });
 
 const AllEvents = asyncHandler(async (req, res) => {
   const events = await Event.find();
-  if (events) {
-    res.status(200).json(events);
-  } else {
-    res.status(404).json({ error: "Events not found" });
+  return res.status(200).json(events);
+});
+
+const UpdateEvent = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  if (!id) {
+    return res
+      .status(404)
+      .json({
+        success: false,
+        message: "Event Id is required for updating event",
+      });
   }
+
+  const empData = req.body;
+  let photoUrl = null;
+
+  if (req.files && req.files.photo) {
+    const photo = req.files.photo;
+
+    try {
+      const uploadedImage = await uploadImageToCloudinary(
+        photo.tempFilePath,
+        process.env.FOLDER_NAME,
+        1000,
+        1000
+      );
+      photoUrl = uploadedImage.secure_url;
+    } catch (error) {
+      return res.status(500).json({ error: "Error uploading image" });
+    }
+  }
+
+  // Include photo URL in the update if it exists
+  if (photoUrl) {
+    empData.photo = photoUrl;
+  }
+
+  const updatedEvent = await Event.findByIdAndUpdate(id, empData, {
+    new: true,
+  });
+  if (!updatedEvent) {
+    return res.status(404).json({ success: false, message: "Event Not Found" });
+  }
+
+  return res
+    .status(200)
+    .json({
+      success: true,
+      data: updatedEvent,
+      message: "Event Updated Successfully...",
+    });
 });
 
 const DeleteEvent = asyncHandler(async (req, res) => {
-
   if (req.user.role !== "admin") {
-    res.status(401).json({error:"only admin can access"})
+    return res.status(401).json({ error: "only admin can access" });
   }
-  
-  const eventId = await Event.findById(req.params.id);
 
+  const eventId = await Event.findById(req.params.id);
   if (eventId) {
     await Event.deleteOne({ _id: req.params.id });
-    res.status(200).json({ message: "Deleted successfully", eventId });
+    return res.status(200).json({ message: "Deleted successfully", eventId });
   } else {
-    res.status(404).json({ error: "Event not found" });
+    return res.status(404).json({ error: "Event not found" });
   }
 });
 
@@ -71,5 +147,6 @@ module.exports = {
   CreateEvent,
   EventDetails,
   AllEvents,
+  UpdateEvent,
   DeleteEvent,
 };

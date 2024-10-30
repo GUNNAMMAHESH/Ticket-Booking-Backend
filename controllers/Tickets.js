@@ -19,11 +19,12 @@ const GetTicketById = asyncHandler(async (req, res) => {
 
 const CreateTicket = asyncHandler(async (req, res) => {
   const { EventName, location, date, price } = req.body;
+console.log("before",req.body);
 
-  if (!EventName || !location || !date || !price) {
-    res.status(400).json({ error: "All fields are required" });
-    return;
-  }
+  // if (!EventName || !location || !date || !price) {
+  //   res.status(400).json({ error: "All fields are required" });
+  //   return;
+  // }
 
   const availableEvent = await Event.findOne({ EventName });
   if (!availableEvent) {
@@ -54,6 +55,7 @@ const CreateTicket = asyncHandler(async (req, res) => {
     SeatNumber,
     price,
   });
+console.log("after",ticket);
 
   res.status(201).json(ticket);
 });

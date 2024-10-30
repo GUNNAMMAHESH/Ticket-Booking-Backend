@@ -11,21 +11,24 @@ const ticket = mongoose.Schema(
       type: String,
       required: [true, "Please enter contact number"],
     },
-    location: {
+    discription: {
       type: String,
-      required: [true, "please enter location"],
     },
     date: {
       type: Date,
       required: [true, "please enter event date"],
     },
-    SeatNumber: {
+    location: {
       type: String,
-      required: [true, "Please enter contact email"],
+      required: [true, "please enter location"],
     },
     price: {
       type: Number,
       required: [true, "please enter price"],
+    },
+    SeatNumber: {
+      type: String,
+      required: [true, "Please enter contact email"],
     },
   },
 

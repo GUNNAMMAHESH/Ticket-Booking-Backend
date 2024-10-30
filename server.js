@@ -5,17 +5,30 @@ require("dotenv").config();
 const app = express();
 const cookieParse = require("cookie-parser");
 const cors = require("cors");
+// const { cloudinaryConnect } = require("./config/coludinary");
+const fileUpload = require("express-fileupload");
 
 connectDb();
+
 app.use(express.json());
+
 app.use(cookieParse());
 const corsOptions = {
   origin: "http://localhost:5173",
   methods: "GET,POST,PUT,PATCH,DELETE",
-  credentials: true, // Allow credentials (cookies, authentication headers, etc.)
+  credentials: true, 
 };
 
 app.use(cors(corsOptions));
+
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+  })
+);
+
+// cloudinaryConnect();
 
 app.get("/", (req, res) => {
   res.send("Server is running");

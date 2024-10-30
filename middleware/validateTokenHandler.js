@@ -8,7 +8,6 @@ const validateToken = asyncHandler(async (req, res, next) => {
 
   if (authHeader && authHeader.startsWith("Bearer")) {
     token = authHeader.split(" ")[1];
-    console.log("tokengfggggggggggg",token);
     
   } else {
     res.status(401);

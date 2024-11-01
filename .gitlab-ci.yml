@@ -1,5 +1,5 @@
 # Use the official Node.js image 
-image: node:16
+image: node:20
 
 # Define stages in the pipeline
 stages:

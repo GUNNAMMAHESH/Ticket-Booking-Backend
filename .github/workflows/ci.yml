@@ -1,50 +1,53 @@
-name: Node CI/CD
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main
-      - mahesh
+      - main  # Change this to your default branch if different
+  pull_request:
+    branches:
+      - main  # Trigger on pull requests to main branch
 
 jobs:
-  install:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
+      # Step 1: Check out the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Node.js environment
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
         with:
-          node-version: '20' # Matches your engine requirement
+          node-version: '20.x'  # Specify the Node.js version
+
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
 
-  test:
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-      - name: Install dependencies
-        run: npm install
+      # Step 4: Run tests
       - name: Run tests
-        run: npm test  # Adjust if you have specific test scripts
+        run: npm test
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-      - name: Install Vercel CLI
-        run: npm install -g vercel
+      # Step 5: Deploy to Vercel
       - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v20.0.0
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}  # Your Vercel token in GitHub secrets
+          vercel-args: '--prod'  # Deploy to production
+          working-directory: .  # Set the working directory
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: vercel --prod --token=$VERCEL_TOKEN
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}  # Your Vercel organization ID (if applicable)
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}  # Your Vercel project ID (if applicable)
+
+      # Optional: Step 6: Notify on deployment success or failure
+      - name: Deployment Notification
+        if: ${{ success() }}
+        run: echo "Deployment to Vercel was successful!"
+
+      - name: Deployment Notification Failure
+        if: ${{ failure() }}
+        run: echo "Deployment to Vercel failed. Please check the logs."
+

@@ -8,6 +8,7 @@ Router.route("/createTicket").post(CreateTicket)
 
 
 Router.route("/getTickets").get(GetTickets)
+
 Router.route("/getTicket/:id").get(GetTicketById)
 Router.route("/DeleteTicket/:id").delete(cancleTicketById)  
 

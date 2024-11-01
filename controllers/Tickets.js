@@ -4,11 +4,33 @@ const Tickets = require("../models/ticket");
 const Event = require("../models/events");
 
 const GetTickets = asyncHandler(async (req, res) => {
-  const ticket = await Tickets.find({ user_id: req.user.id });
-  if (!ticket) {
-    res.status(200).json({ error: "Tickets not Found" });
+
+  try {
+    // Get the user parameter from the query
+    const { user } = req.query; // e.g., ?user=12345
+
+    let tickets;
+    
+    // If a user is provided, filter by user; otherwise, get all tickets
+    if (user) {
+      tickets = await Tickets.find({ user }); // Adjust this based on your schema
+    } else {
+      tickets = await Tickets.find({user_id: req.user.id }); // Get all tickets
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: tickets,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching tickets",
+      error: error.message,
+    });
   }
-  res.status(200).json(ticket);
+
+
 });
 
 const GetTicketById = asyncHandler(async (req, res) => {
@@ -18,7 +40,7 @@ const GetTicketById = asyncHandler(async (req, res) => {
 
 
 const CreateTicket = asyncHandler(async (req, res) => {
-  const { EventName, location, date, price } = req.body;
+  const { EventName, location, date, price ,photo} = req.body;
 console.log("before",req.body);
 
   // if (!EventName || !location || !date || !price) {
@@ -54,6 +76,7 @@ console.log("before",req.body);
     date,
     SeatNumber,
     price,
+    photo
   });
 console.log("after",ticket);
 

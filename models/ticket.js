@@ -11,6 +11,9 @@ const ticket = mongoose.Schema(
       type: String,
       required: [true, "Please enter contact number"],
     },
+    photo:{
+      type:String
+    },
     discription: {
       type: String,
     },
@@ -24,7 +27,7 @@ const ticket = mongoose.Schema(
     },
     price: {
       type: Number,
-      required: [true, "please enter price"],
+      // required: [true, "please enter price"],
     },
     SeatNumber: {
       type: String,

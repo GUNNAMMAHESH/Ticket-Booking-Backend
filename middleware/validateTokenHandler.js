@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
-const user = require("../models/user");
+const User = require("../models/user");
 
 const validateToken = asyncHandler(async (req, res, next) => {
   let token;
@@ -8,8 +8,6 @@ const validateToken = asyncHandler(async (req, res, next) => {
 
   if (authHeader && authHeader.startsWith("Bearer")) {
     token = authHeader.split(" ")[1];
-    console.log("tokengfggggggggggg",token);
-    
   } else {
     res.status(401);
     throw new Error("User is not authorized or token is missing");
@@ -32,4 +30,24 @@ const validateToken = asyncHandler(async (req, res, next) => {
   });
 });
 
-module.exports = validateToken;
+// const hasRole = (...roles) => {
+//   return async (req, res, next) => {
+//     try {
+//       const userDetails = await User.findOne({ email: req.user.email });
+//       if (!roles.includes(userDetails.role)) {
+//         return res.status(403).json({
+//           success: false,
+//           message: "You do not have permission to access this route",
+//         });
+//       }
+//       next();
+//     } catch (error) {
+//       return res
+//         .status(500)
+//         .json({ success: false, message: "User Role Can't be Verified" });
+//     }
+//   };
+// };
+
+// Correctly export both functions
+module.exports =  validateToken ;

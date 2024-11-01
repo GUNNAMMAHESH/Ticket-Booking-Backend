@@ -5,11 +5,12 @@ const validateToken = require("../middleware/validateTokenHandler");
 
 Router.use(validateToken)
 Router.route("/createTicket").post(CreateTicket)
-Router.route("/DeleteTicket/:id").delete(cancleTicketById)
+
 
 Router.route("/getTickets").get(GetTickets)
-Router.route("/getTicket/:id").get(GetTicketById)
 
+Router.route("/getTicket/:id").get(GetTicketById)
+Router.route("/DeleteTicket/:id").delete(cancleTicketById)  
 
 
 module.exports = Router;

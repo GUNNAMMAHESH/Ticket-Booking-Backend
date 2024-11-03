@@ -41,8 +41,8 @@ app.use("/events", require("./Routes/events"));
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`server is running on http://localhost:${PORT}/ `);
-});
+// app.listen(PORT, () => {
+//   console.log(`server is running on http://localhost:${PORT}/ `);
+// });
 
-// module.exports = app;
+module.exports = app;

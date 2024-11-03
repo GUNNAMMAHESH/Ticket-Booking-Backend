@@ -1,21 +1,25 @@
-const otpGenerator = require('otp-generator');
-const OTP = require('../models/otp');
-const User = require('../models/user');
+const otpGenerator = require("otp-generator");
+const OTP = require("../models/otp");
+const User = require("../models/user");
 
 exports.sendOTP = async (req, res) => {
   try {
-    const { email } = req.body;
-  
+    const { email, password } = req.body;
+
     // Check if user already exists
     const checkUserPresent = await User.findOne({ email });
-    
+
     if (!checkUserPresent) {
       return res.status(401).json({
         success: false,
-        message: 'User is not registered',
+        message: "User is not registered",
       });
     }
+console.log(password);
 
+    if (User.password !== password) {
+      return res.status(401).json({success:false,message:"Incorrect Password"});
+    }
     // Generate OTP
     let otp = otpGenerator.generate(6, {
       upperCaseAlphabets: false,
@@ -41,10 +45,9 @@ exports.sendOTP = async (req, res) => {
     // Send response back
     res.status(200).json({
       success: true,
-      message: 'OTP sent successfully',
-      otp,  // This is usually not returned in production for security
+      message: "OTP sent successfully",
+      otp, // This is usually not returned in production for security
     });
-
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({ success: false, error: error.message });

@@ -14,7 +14,7 @@ app.use(express.json());
 
 app.use(cookieParse());
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: "http://localhost:3000",
   methods: "GET,POST,PUT,PATCH,DELETE",
   credentials: true, 
 };
@@ -40,9 +40,9 @@ app.use("/events", require("./Routes/events"));
 
 app.use(errorHandler);
 
-// const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => {
-//   console.log(`server is running on http://localhost:${PORT}/ `);
-// });
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`server is running on http://localhost:${PORT}/ `);
+});
 
-module.exports = app;
+// module.exports = app;

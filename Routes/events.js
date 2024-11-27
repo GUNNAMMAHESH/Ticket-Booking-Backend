@@ -16,7 +16,7 @@ const Router = express.Router();
 Router.post("/create", validateToken, CreateEvent); //hasRole("admin")
 Router.get("/eventdetails/:id", EventDetails);
 Router.get("/allevents", AllEvents);
-Router.patch("/editEvent", validateToken, UpdateEvent);
+Router.patch("/editEvent/:id", validateToken, UpdateEvent);
 Router.delete("/delete/:id", validateToken, DeleteEvent);
 
 module.exports = Router;

@@ -13,11 +13,16 @@ connectDb();
 app.use(express.json());
 
 app.use(cookieParse());
+
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: [
+    "http://localhost:3000", 
+    "https://ticket-booking-frontend-evtatvuzo-maheshs-projects-7b91ea20.vercel.app"
+  ],
   methods: "GET,POST,PUT,PATCH,DELETE",
   credentials: true, 
 };
+
 
 app.use(cors(corsOptions));
 
@@ -33,6 +38,7 @@ app.use(
 app.get("/", (req, res) => {
   res.send("Server is running");
 });
+
 app.use("/tickets", require("./Routes/tickets"));
 app.use("/admin", require("./Routes/admin"));
 app.use("/user", require("./Routes/user"));

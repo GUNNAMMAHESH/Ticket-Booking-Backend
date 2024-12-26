@@ -1,4 +1,4 @@
-// config/coludinary.js
+
 const cloudinary = require("cloudinary").v2;
 require("dotenv").config();
 

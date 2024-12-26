@@ -8,7 +8,7 @@ const mailSender = async (email, subject, message) => {
     secure: true,
     auth: {
       user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASS,  // Use the app password generated
+      pass: process.env.MAIL_PASS,  
     },
   });
 

@@ -45,24 +45,17 @@ console.log("files:",req.files);
 
   return res.status(201).json(event);
 
-// console.log("uploadImageToCloudinary:", uploadImageToCloudinary); 
+  // console.log("uploadImageToCloudinary:", uploadImageToCloudinary);
 
-// if (!req.files || !req.files.photo) {
-//   return res.status(400).json({ error: "No file uploaded." });
-// }
+  // if (!req.files || !req.files.photo) {
+  //   return res.status(400).json({ error: "No file uploaded." });
+  // }
 
-// const photo = req.files.photo;
+  // const photo = req.files.photo;
 
-// try {
-//   const result = await uploadImageToCloudinary(photo.tempFilePath, "test-folder");
-//   return res.status(200).json({ url: result.secure_url });
-// } catch (error) {
-//   return res.status(500).json({ error: "Upload failed." });
-// }
 
 
 });
-
 
 const EventDetails = asyncHandler(async (req, res) => {
   const eventId = await Event.findById(req.params.id);
@@ -81,12 +74,10 @@ const AllEvents = asyncHandler(async (req, res) => {
 const UpdateEvent = asyncHandler(async (req, res) => {
   const id = req.params.id;
   if (!id) {
-    return res
-      .status(404)
-      .json({
-        success: false,
-        message: "Event Id is required for updating event",
-      });
+    return res.status(404).json({
+      success: false,
+      message: "Event Id is required for updating event",
+    });
   }
 
   const empData = req.body;
@@ -120,13 +111,11 @@ const UpdateEvent = asyncHandler(async (req, res) => {
     return res.status(404).json({ success: false, message: "Event Not Found" });
   }
 
-  return res
-    .status(200)
-    .json({
-      success: true,
-      data: updatedEvent,
-      message: "Event Updated Successfully...",
-    });
+  return res.status(200).json({
+    success: true,
+    data: updatedEvent,
+    message: "Event Updated Successfully...",
+  });
 });
 
 const DeleteEvent = asyncHandler(async (req, res) => {

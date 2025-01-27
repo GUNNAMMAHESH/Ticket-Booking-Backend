@@ -7,7 +7,7 @@ const cookieParse = require("cookie-parser");
 const cors = require("cors");
 // const { cloudinaryConnect } = require("./config/coludinary");
 const fileUpload = require("express-fileupload");
-
+const {verifyCaptcha} = require("./controllers/otp")
 connectDb();
 
 app.use(express.json());
@@ -44,7 +44,7 @@ app.use("/tickets", require("./Routes/tickets"));
 app.use("/admin", require("./Routes/admin"));
 app.use("/user", require("./Routes/user"));
 app.use("/events", require("./Routes/events"));
-
+app.post('/verify-captcha',verifyCaptcha)
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;

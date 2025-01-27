@@ -59,7 +59,7 @@ exports.sendOTP = async (req, res) => {
   }
 };
 
-const verifyCaptcha = async (req, res) => {
+exports.verifyCaptcha = async (req, res) => {
   const { captchaValue } = req.body;
 
   if (!captchaValue) {
@@ -89,7 +89,5 @@ const verifyCaptcha = async (req, res) => {
   }
 };
 
-module.exports = {
-  verifyCaptcha,
-};
+
 

@@ -58,35 +58,3 @@ exports.sendOTP = async (req, res) => {
     return res.status(500).json({ success: false, error: error.message });
   }
 };
-
-exports.verifyCaptcha = async (req, res) => {
-  const { captchaValue } = req.body;
-
-  if (!captchaValue) {
-    return res.status(400).json({ success: false, message: "No CAPTCHA value provided" });
-  }
-
-  try {
-
-    const response = await axios.post(
-      "https://www.google.com/recaptcha/api/siteverify",
-      null,
-      {
-        params: {
-          secret: process.env.secretKey,
-          response: captchaValue,
-        },
-      }
-    );
-
-    if (response.data.success) {
-      res.json({ success: true });
-    } else {
-      res.status(400).json({ success: false, message: "CAPTCHA verification failed" });
-    }
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Error verifying CAPTCHA" });
-  }
-};
-
-

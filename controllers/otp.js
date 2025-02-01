@@ -6,7 +6,7 @@ const User = require("../models/user");
 require("dotenv").config();
 
 
-exports.sendOTP = async (req, res) => {
+const sendOTP = async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log("log", req.body);
@@ -58,3 +58,40 @@ exports.sendOTP = async (req, res) => {
     return res.status(500).json({ success: false, error: error.message });
   }
 };
+
+
+const verifyCaptcha = async (req, res) => {
+  const { captchaValue } = req.body;
+
+  if (!captchaValue) {
+    return res.status(400).json({ success: false, message: "Captcha value is required" });
+  }
+
+  const secretKey = process.env.RECAPTCHA_SECRET_KEY; // Use your secret key from .env
+
+  try {
+    const response = await axios.post(
+      "https://www.google.com/recaptcha/api/siteverify",
+      null,
+      {
+        params: {
+          secret: secretKey,
+          response: captchaValue, // The token received from the frontend
+        },
+      }
+    );
+
+    // Check if the CAPTCHA verification was successful
+    if (response.data.success) {
+      return res.status(200).json({ success: true, message: "Captcha verified" });
+    } else {
+      return res.status(400).json({ success: false, message: "Captcha verification failed" });
+    }
+  } catch (error) {
+    console.error("Error verifying CAPTCHA:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+module.exports = {sendOTP, verifyCaptcha };
+

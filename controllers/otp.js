@@ -1,16 +1,14 @@
-const axios = require('axios');
+const axios = require("axios");
 const otpGenerator = require("otp-generator");
 const bcrypt = require("bcrypt");
 const OTP = require("../models/otp");
 const User = require("../models/user");
 require("dotenv").config();
 
-
 const sendOTP = async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log("log", req.body);
-
 
     const checkUserPresent = await User.findOne({ email });
 
@@ -22,7 +20,7 @@ const sendOTP = async (req, res) => {
     }
     console.log(checkUserPresent.password);
 
-    if (!(await bcrypt.compare(password, checkUserPresent.password))  ) {
+    if (!(await bcrypt.compare(password, checkUserPresent.password))) {
       return res
         .status(401)
         .json({ success: false, message: "Incorrect Password" });
@@ -44,14 +42,13 @@ const sendOTP = async (req, res) => {
       result = await OTP.findOne({ otp });
     }
 
-
     const otpPayload = { email, otp };
     const otpBody = await OTP.create(otpPayload);
 
     res.status(200).json({
       success: true,
       message: "OTP sent successfully",
-      otp, 
+      otp,
     });
   } catch (error) {
     console.error(error.message);
@@ -59,16 +56,15 @@ const sendOTP = async (req, res) => {
   }
 };
 
-
 const verifyCaptcha = async (req, res) => {
-  const { captchaValue } = req.body;
-  console.log("req",req.body);
-  console.log("cap",captchaValue);
-  
-  
+  const { captchaValue } = req.body.captchaValue;
+  console.log("req", req.body);
+  console.log("cap", captchaValue);
 
   if (!captchaValue) {
-    return res.status(400).json({ success: false, message: "Captcha value is required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Captcha value is required" });
   }
 
   const secretKey = process.env.RECAPTCHA_SECRET_KEY; // Use your secret key from .env
@@ -80,21 +76,26 @@ const verifyCaptcha = async (req, res) => {
       {
         params: {
           secret: secretKey,
-          response: captchaValue, 
+          response: captchaValue,
         },
       }
     );
 
     if (response.data.success) {
-      return res.status(200).json({ success: true, message: "Captcha verified" });
+      return res
+        .status(200)
+        .json({ success: true, message: "Captcha verified" });
     } else {
-      return res.status(400).json({ success: false, message: "Captcha verification failed" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Captcha verification failed" });
     }
   } catch (error) {
     console.error("Error verifying CAPTCHA:", error);
-    return res.status(500).json({ success: false, message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
 
-module.exports = {sendOTP, verifyCaptcha };
-
+module.exports = { sendOTP, verifyCaptcha };

@@ -76,12 +76,11 @@ const verifyCaptcha = async (req, res) => {
       {
         params: {
           secret: secretKey,
-          response: captchaValue, // The token received from the frontend
+          response: captchaValue, 
         },
       }
     );
 
-    // Check if the CAPTCHA verification was successful
     if (response.data.success) {
       return res.status(200).json({ success: true, message: "Captcha verified" });
     } else {

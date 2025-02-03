@@ -62,6 +62,10 @@ const sendOTP = async (req, res) => {
 
 const verifyCaptcha = async (req, res) => {
   const { captchaValue } = req.body;
+  console.log("req",req.body);
+  console.log("cap",captchaValue);
+  
+  
 
   if (!captchaValue) {
     return res.status(400).json({ success: false, message: "Captcha value is required" });

@@ -1,9 +1,9 @@
 const asyncHandler = require("express-async-handler");
 const { uploadImageToCloudinary } = require("../config/coludinary");
 const Event = require("../models/events");
+const mongoose = require("mongoose");
 
 const CreateEvent = asyncHandler(async (req, res) => {
-  
   if (req.user.role !== "admin") {
     return res.status(401).json({ error: "only admin can access" });
   }
@@ -15,9 +15,8 @@ const CreateEvent = asyncHandler(async (req, res) => {
   }
 
   let photoUrl = null;
-console.log("body:",req.body);
-console.log("files:",req.files);
-
+  console.log("body:", req.body);
+  console.log("files:", req.files);
 
   if (req.files && req.files.photo) {
     const photo = req.files.photo;
@@ -31,7 +30,7 @@ console.log("files:",req.files);
       );
       photoUrl = uploadedImage.secure_url;
     } catch (error) {
-      return res.status(500).json({ error: "Error uploading image"});
+      return res.status(500).json({ error: "Error uploading image" });
     }
   }
 
@@ -52,9 +51,6 @@ console.log("files:",req.files);
   // }
 
   // const photo = req.files.photo;
-
-
-
 });
 
 const EventDetails = asyncHandler(async (req, res) => {
@@ -120,17 +116,29 @@ const UpdateEvent = asyncHandler(async (req, res) => {
 
 const DeleteEvent = asyncHandler(async (req, res) => {
   if (req.user.role !== "admin") {
-    return res.status(401).json({ error: "only admin can access" });
+    return res.status(401).json({ error: "Only admin can access this" });
   }
 
-  const eventId = await Event.findById(req.params.id);
-  if (eventId) {
-    await Event.deleteOne({ _id: req.params.id });
-    return res.status(200).json({ message: "Deleted successfully", eventId });
-  } else {
+  const eventId = req.params.id;
+
+  if (!mongoose.Types.ObjectId.isValid(eventId)) {
+    return res.status(400).json({ error: "Invalid event ID" });
+  }
+
+  const event = await Event.findById(eventId);
+
+  if (!event) {
     return res.status(404).json({ error: "Event not found" });
   }
+
+  await Event.deleteOne({ _id: eventId });
+
+  return res
+    .status(200)
+    .json({ message: "Event deleted successfully", eventId });
 });
+
+module.exports = DeleteEvent;
 
 module.exports = {
   CreateEvent,

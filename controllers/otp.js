@@ -57,9 +57,7 @@ const sendOTP = async (req, res) => {
 };
 
 const verifyCaptcha = async (req, res) => {
-  const { captchaValue } = req.body.captchaValue;
-  console.log("req", req.body);
-  console.log("cap", captchaValue);
+  const { captchaValue } = req.body;
 
   if (!captchaValue) {
     return res
@@ -67,8 +65,7 @@ const verifyCaptcha = async (req, res) => {
       .json({ success: false, message: "Captcha value is required" });
   }
 
-  const secretKey = process.env.RECAPTCHA_SECRET_KEY; // Use your secret key from .env
-
+  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
   try {
     const response = await axios.post(
       "https://www.google.com/recaptcha/api/siteverify",
@@ -86,9 +83,11 @@ const verifyCaptcha = async (req, res) => {
         .status(200)
         .json({ success: true, message: "Captcha verified" });
     } else {
-      return res
-        .status(400)
-        .json({ success: false, message: "Captcha verification failed" });
+      return res.status(400).json({
+        success: false,
+        message: "Captcha verification failed",
+        error: response.data,
+      });
     }
   } catch (error) {
     console.error("Error verifying CAPTCHA:", error);

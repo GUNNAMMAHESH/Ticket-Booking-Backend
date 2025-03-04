@@ -17,7 +17,8 @@ app.use(cookieParse());
 const corsOptions = {
   origin: [
     "http://localhost:3000", 
-    "https://ticket-booking-frontend-alpha.vercel.app"
+    "https://ticket-booking-frontend-alpha.vercel.app",
+    "https://ticket-booking-frontend-3xq98deax-maheshs-projects-7b91ea20.vercel.app"
     
   ],
   methods: "GET,POST,PUT,PATCH,DELETE",
